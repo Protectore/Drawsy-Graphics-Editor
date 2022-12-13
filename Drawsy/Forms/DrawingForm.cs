@@ -1,6 +1,7 @@
 ﻿using Drawsy.Core;
 using Drawsy.Core.Figures;
 using Drawsy.Core.FiguresFactory;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -16,6 +17,8 @@ namespace Drawsy.Forms
             };
 
         private FiguresEnum _figureToCreate = FiguresEnum.None;
+        private Figure _tmpFigure;
+        private PointF _tmpPoint;
 
         private Timer _timer = new Timer();
 
@@ -26,8 +29,9 @@ namespace Drawsy.Forms
 
             controlsPanel.Layout += ControlsPanel_Layout;
             // TODO: вынести в конфиг
-            _timer.Interval = 100;
+            _timer.Interval = 10;
             _timer.Tick += UpdateScreen;
+            _timer.Start();
 
             AddControlButtons();
         }
@@ -64,23 +68,50 @@ namespace Drawsy.Forms
             controlsPanel.PerformLayout();
         }
 
-        private void SelectFigureButtonClick(object sender, System.EventArgs e)
+        private void SelectFigureButtonClick(object sender, EventArgs e)
         {
             _figureToCreate = (sender as SelectFigureButton).Figure;
         }
 
         private void pictureBox_MouseDown(object sender, MouseEventArgs e)
         {
-            // TODO: size, color
-            Figure fig = FigureFactoryManager.GetFactory(_figureToCreate)
-                .Create(new Point(e.X, e.Y), new PointF(e.X + 40, e.Y + 40), Color.Black);
-            DrawingContext.Instance.AddNewFigure(fig);
-            UpdateScreen(this, System.EventArgs.Empty);
+            _tmpPoint = e.Location;
+
+            // TODO: color
+            _tmpFigure = FigureFactoryManager.GetFactory(_figureToCreate)
+                .Create(_tmpPoint, _tmpPoint, Color.Black);
+            
+            UpdateScreen(this, EventArgs.Empty);
+        }
+
+        private void pictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_tmpFigure is null)
+                return;
+
+            _tmpFigure.Point1 = new PointF(
+                Math.Min(_tmpPoint.X, e.Location.X),
+                Math.Min(_tmpPoint.Y, e.Location.Y)
+                );
+
+            _tmpFigure.Point2 = new PointF(
+                Math.Max(_tmpPoint.X, e.Location.X),
+                Math.Max(_tmpPoint.Y, e.Location.Y)
+                );
+        }
+
+        private void pictureBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            DrawingContext.Instance.AddNewFigure(_tmpFigure);
+            _tmpFigure = null;
+            _tmpPoint = PointF.Empty;
         }
 
         private void pictureBox_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawImage(DrawingContext.Instance.Image, 0, 0);
+            if (_tmpFigure != null)
+                _tmpFigure.Draw(e.Graphics);
         }
     }
 }

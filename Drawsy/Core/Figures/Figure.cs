@@ -11,28 +11,28 @@ namespace Drawsy.Core.Figures
         /// <summary>
         /// Координаты верхневого левого угла фигуры
         /// </summary>
-        public PointF Point1 => _point1;
+        public PointF Point1 { get; set; }
         /// <summary>
         /// X координата левого верхнего угла фигуры
         /// </summary>
-        public float X1 => _point1.X;
+        public float X1 => Point1.X;
         /// <summary>
         /// Y координата левого верхнего угла фигуры
         /// </summary>
-        public float Y1 => _point1.Y;
+        public float Y1 => Point1.Y;
 
         /// <summary>
         /// Координаты правого нижнего угла фигуры
         /// </summary>
-        public PointF Point2 => _point2;
+        public PointF Point2 { get; set; }
         /// <summary>
         /// X координата правого нижнего угла фигуры
         /// </summary>
-        public float X2 => _point2.X;
+        public float X2 => Point2.X;
         /// <summary>
         /// Y координата правого нижнего угла фигуры
         /// </summary>
-        public float Y2 => _point2.Y;
+        public float Y2 => Point2.Y;
 
         /// <summary>
         /// Размер фигуры
@@ -47,7 +47,6 @@ namespace Drawsy.Core.Figures
         /// </summary>
         public float Height => Size.Height;
 
-        protected PointF _point1, _point2;
         protected Color _color;
 
         // TODO: set this value somewhere from config
@@ -61,8 +60,8 @@ namespace Drawsy.Core.Figures
         /// <param name="color">Цвет фигуры</param>
         public Figure(PointF point1, PointF point2, Color color)
         {
-            _point1 = point1;
-            _point2 = point2;
+            Point1 = point1;
+            Point2 = point2;
             _color = color;
         }
 
